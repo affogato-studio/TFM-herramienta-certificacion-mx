@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=Gloock&display=swap">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'%3E%3Cpath d='M50 114 C 30 94, 4 72, 6 40 C 8 14, 32 6, 45 22 L50 30 L55 22 C 68 6, 92 14, 94 40 C 96 72, 70 94, 50 114 Z' fill='%23ef8ea9' stroke='%232f6b3c' stroke-width='7'/%3E%3Cpath d='M50 30 L50 110' stroke='%238e1a3e' stroke-width='5'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6b3c'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23c2264f'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -22,111 +22,82 @@
       </div>
       <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">Modo oscuro</button>
     </div>
-    <nav class="wrap tabs" role="tablist" aria-label="Secciones">
-      <button role="tab" data-tab="tool" class="active">Herramienta</button>
-      <button role="tab" data-tab="states">Por estado</button>
-      <button role="tab" data-tab="ref">Consulta</button>
-      <button role="tab" data-tab="params">Parámetros</button>
-    </nav>
   </header>
-
-  <div id="modified" class="banner wrap" hidden>
-    Estás usando parámetros distintos a los del Excel.
-    <button class="link" data-action="reset">Volver a los valores del Excel</button>
-  </div>
 
   <main class="wrap">
     <div id="loading" class="loading">Cargando la malla climática e hídrica de México…</div>
 
-    <!-- ============ HERRAMIENTA ============ -->
-    <section id="tab-tool" class="tab" hidden>
-      <div class="layout">
-        <form class="form" id="form" autocomplete="off" onsubmit="return false">
-          <fieldset>
-            <legend>Ubicación</legend>
-            <div id="map" class="map" aria-label="Mapa de México: haz clic para ubicar el proyecto"></div>
-            <label for="in-city-search">Buscar ciudad</label>
-            <input id="in-city-search" list="city-list" placeholder="Escribe una ciudad, p. ej. Guadalajara">
-            <datalist id="city-list"></datalist>
-            <p class="help">O haz clic en el mapa. Las coordenadas se ajustan solas.</p>
-            <div class="row2">
-              <div><label for="in-lat">Latitud (°N)</label><input id="in-lat" type="number" step="0.0001" min="14" max="33" inputmode="decimal"></div>
-              <div><label for="in-lon">Longitud (°, negativa)</label><input id="in-lon" type="number" step="0.0001" min="-119" max="-86" inputmode="decimal"></div>
-            </div>
-            <p class="place" id="place"></p>
-          </fieldset>
+    <div id="app" hidden>
+      <nav class="stepper" aria-label="Pasos">
+        <ol>
+          <li><button type="button" data-step="1"><span class="n">1</span><span class="t">Ubicación</span></button></li>
+          <li><button type="button" data-step="2"><span class="n">2</span><span class="t">Proyecto</span></button></li>
+          <li><button type="button" data-step="3"><span class="n">3</span><span class="t">Promotor</span></button></li>
+          <li><button type="button" data-step="4"><span class="n">4</span><span class="t">Resultado</span></button></li>
+        </ol>
+      </nav>
 
-          <fieldset>
-            <legend>Proyecto</legend>
-            <label for="in-typology">Tipología</label>
-            <select id="in-typology"></select>
-            <p class="help">Define qué incentivos mexicanos aplican.</p>
-            <div class="row2">
-              <div><label for="in-area">Superficie construida</label><div class="unit"><input id="in-area" type="number" min="1" step="1" inputmode="numeric"><span>m²</span></div></div>
-              <div><label for="in-units">Departamentos</label><input id="in-units" type="number" min="0" step="1" inputmode="numeric"></div>
-            </div>
-            <p class="help">La superficie fija las tarifas de LEED y EDGE y los costos de consultoría; los departamentos, la tarifa de BREEAM.</p>
-            <span class="label">¿El promotor es miembro de USGBC?</span>
-            <div class="seg" role="radiogroup" aria-label="Miembro de USGBC">
-              <label><input type="radio" name="usgbc" value="Sí"><span>Sí</span></label>
-              <label><input type="radio" name="usgbc" value="No"><span>No</span></label>
-            </div>
-            <p class="help">Los miembros pagan menos por el registro y la revisión de LEED.</p>
-          </fieldset>
-
-          <fieldset>
-            <legend>Promotor</legend>
-            <label for="in-objective">Objetivo del promotor</label>
-            <select id="in-objective"></select>
-            <p class="help" id="objective-help"></p>
-            <label for="in-budget">Presupuesto para certificar</label>
-            <div class="unit"><span class="pre">US$</span><input id="in-budget" type="text" inputmode="numeric" placeholder="Sin límite"><span>USD</span></div>
-            <p class="help">Incluye tarifas, consultoría y estudios. Las certificaciones que no caben se descartan. Déjalo vacío para no filtrar.</p>
-          </fieldset>
-
-          <div id="in-errors" class="errors" role="alert"></div>
-          <div class="actions">
-            <button type="button" class="btn ghost" data-action="example">Usar el ejemplo del TFM</button>
-            <button type="button" class="btn" data-action="print">Imprimir o guardar PDF</button>
+      <form id="form" autocomplete="off" onsubmit="return false">
+        <!-- Paso 1 -->
+        <section class="step" data-step="1" aria-labelledby="h-step1">
+          <h2 id="h-step1">¿Dónde está el proyecto?</h2>
+          <p class="lead">Haz clic en el mapa o busca una ciudad. Con la ubicación se obtienen el clima Köppen-Geiger y el estrés hídrico del acuífero.</p>
+          <div id="map" class="map" aria-label="Mapa de México: haz clic para ubicar el proyecto"></div>
+          <label for="in-city-search">Buscar ciudad</label>
+          <input id="in-city-search" list="city-list" placeholder="Escribe una ciudad, p. ej. Guadalajara">
+          <datalist id="city-list"></datalist>
+          <div class="row2">
+            <div><label for="in-lat">Latitud (°N)</label><input id="in-lat" type="number" step="0.0001" min="14" max="33" inputmode="decimal"></div>
+            <div><label for="in-lon">Longitud (°, negativa)</label><input id="in-lon" type="number" step="0.0001" min="-119" max="-86" inputmode="decimal"></div>
           </div>
-        </form>
+          <div class="place" id="place" aria-live="polite"></div>
+        </section>
 
-        <div class="results" id="results" aria-live="polite"></div>
-      </div>
-    </section>
+        <!-- Paso 2 -->
+        <section class="step" data-step="2" aria-labelledby="h-step2" hidden>
+          <h2 id="h-step2">¿Cómo es el proyecto?</h2>
+          <p class="lead">Estos datos definen las tarifas de cada certificación y los incentivos mexicanos que aplican.</p>
+          <label for="in-typology">Tipología</label>
+          <select id="in-typology"></select>
+          <p class="help">Define qué incentivos mexicanos aplican (Hipoteca Verde, EcoCasa, Taxonomía Sostenible).</p>
+          <div class="row2">
+            <div><label for="in-area">Superficie construida</label><div class="unit"><input id="in-area" type="number" min="1" step="1" inputmode="numeric"><span>m²</span></div></div>
+            <div><label for="in-units">Departamentos</label><input id="in-units" type="number" min="0" step="1" inputmode="numeric"></div>
+          </div>
+          <p class="help">La superficie fija las tarifas de LEED y EDGE y los costos de consultoría; los departamentos, la tarifa de BREEAM.</p>
+          <span class="label">¿El promotor es miembro de USGBC?</span>
+          <div class="seg" role="radiogroup" aria-label="Miembro de USGBC">
+            <label><input type="radio" name="usgbc" value="Sí"><span>Sí</span></label>
+            <label><input type="radio" name="usgbc" value="No"><span>No</span></label>
+          </div>
+          <p class="help">Los miembros pagan menos por el registro y la revisión de LEED.</p>
+        </section>
 
-    <!-- ============ ESTADOS ============ -->
-    <section id="tab-states" class="tab" hidden>
-      <div class="panel">
-        <h2>Recomendación por estado</h2>
-        <p class="help wide" id="states-note"></p>
-        <div id="states-summary" class="chips"></div>
-        <div class="table-wrap"><table id="states-table" class="data sortable"></table></div>
-      </div>
-    </section>
+        <!-- Paso 3 -->
+        <section class="step" data-step="3" aria-labelledby="h-step3" hidden>
+          <h2 id="h-step3">¿Qué busca el promotor?</h2>
+          <p class="lead">El objetivo cambia el peso de cada criterio; el presupuesto descarta las certificaciones que no caben.</p>
+          <span class="label" id="obj-label">Objetivo del promotor</span>
+          <div class="choices" id="in-objective" role="radiogroup" aria-labelledby="obj-label"></div>
+          <label for="in-budget">Presupuesto para certificar (opcional)</label>
+          <div class="unit"><span class="pre">US$</span><input id="in-budget" type="text" inputmode="numeric" placeholder="Sin límite"><span>USD</span></div>
+          <p class="help">Incluye tarifas, consultoría y estudios. Déjalo vacío para no filtrar por costo.</p>
+        </section>
 
-    <!-- ============ CONSULTA ============ -->
-    <section id="tab-ref" class="tab" hidden>
-      <div class="panel">
-        <h2>Consulta</h2>
-        <div class="subtabs" id="ref-tabs"></div>
-        <div id="ref-body"></div>
-      </div>
-    </section>
+        <!-- Paso 4 -->
+        <section class="step step-result" data-step="4" aria-labelledby="h-step4" hidden>
+          <h2 id="h-step4" class="sr-only">Resultado</h2>
+          <div class="summary" id="summary"></div>
+          <div class="results" id="results" aria-live="polite"></div>
+        </section>
 
-    <!-- ============ PARÁMETROS ============ -->
-    <section id="tab-params" class="tab" hidden>
-      <div class="panel">
-        <h2>Parámetros de la regla de decisión</h2>
-        <p class="help wide">Son las celdas editables del Excel (HERRAMIENTA sección 6, PESOS AHP y COSTOS). Los cambios se guardan solo en este navegador y la herramienta se recalcula al instante. En los juicios AHP puedes escribir fracciones como <code>1/3</code>. Las celdas modificadas se marcan en color.</p>
-        <div class="actions">
-          <button class="btn ghost" data-action="reset">Volver a los valores del Excel</button>
-          <button class="btn ghost" data-action="export-params">Descargar parámetros (JSON)</button>
-          <label class="btn ghost file">Cargar parámetros (JSON)<input type="file" id="import-params" accept="application/json"></label>
+        <div id="step-errors" class="errors" role="alert"></div>
+        <div class="step-nav" id="step-nav">
+          <button type="button" class="btn ghost" id="btn-back">Atrás</button>
+          <button type="button" class="btn" id="btn-next">Siguiente</button>
         </div>
-        <div id="params-body"></div>
-      </div>
-    </section>
+      </form>
+    </div>
   </main>
 
   <footer class="wrap foot">

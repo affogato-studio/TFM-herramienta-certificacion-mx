@@ -13,7 +13,7 @@ La web reproduce todas las fórmulas del Excel. `tools/verify.mjs` compara 360 r
 
 | Archivo | Qué es |
 |---|---|
-| `index.html`, `css/`, `js/app.js` | Interfaz (pestañas Herramienta, Resumen por estados, Consulta, Parámetros) |
+| `index.html`, `css/`, `js/app.js` | Interfaz paso a paso: Ubicación → Proyecto → Promotor → Resultado |
 | `js/engine.js` | Motor de cálculo: cada función indica la hoja y las celdas del Excel que replica |
 | `data/base.json` | Parámetros, juicios AHP, requisitos, normativa, acuíferos, ciudades… |
 | `data/grid.json` | Malla de 72 214 celdas (estado, Köppen, acuífero) |
@@ -34,7 +34,9 @@ La web reproduce todas las fórmulas del Excel. `tools/verify.mjs` compara 360 r
    ```
 4. Sube los cambios a GitHub (`git add -A`, `git commit -m "..."`, `git push`).
 
-> Las constantes de las tarifas (hoja COSTOS) están escritas en las fórmulas del Excel, no en celdas. Si cambian, edítalas en `tools/export_excel.py` (sección `fees`) o desde la pestaña Parámetros.
+> Las constantes de las tarifas (hoja COSTOS) están escritas en las fórmulas del Excel, no en celdas. Si cambian, edítalas en `tools/export_excel.py` (sección `fees`).
+>
+> El motor (`js/engine.js`) también calcula el resumen por estados; la web no lo muestra, pero `verify.mjs` lo sigue comprobando.
 
 ## Ver la web en tu computadora
 
@@ -55,4 +57,4 @@ En el repositorio: **Settings → Pages → Build and deployment → Source: Dep
 
 - La opción «Forzar región AHP» del Excel no aparece en la web (nota «QUITAR» en la celda D12). El motor la sigue admitiendo (`forceRegion`).
 - Los costos indirectos, el reconocimiento internacional y la exigencia técnica son **supuestos de la autora** que conviene validar con cotizaciones y expertos.
-- Los parámetros editados en la pestaña Parámetros se guardan solo en el navegador de quien los edita. Se pueden descargar o cargar como JSON.
+- La web usa siempre los parámetros del Excel; para cambiarlos, edita el Excel y vuelve a exportar.
