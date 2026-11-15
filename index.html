@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Selección de certificación sostenible · México</title>
+  <meta name="description" content="Herramienta para elegir entre LEED v4, BREEAM Int. NC v7 y EDGE v3 según la ubicación, el clima, el estrés hídrico, el objetivo y el presupuesto del promotor en México.">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <div>
+        <h1>Selección de certificación sostenible</h1>
+        <p class="sub">LEED v4 BD+C · BREEAM Int. NC v7 · EDGE v3 — según el sitio, el objetivo y el presupuesto del promotor en México</p>
+      </div>
+      <nav class="tabs" role="tablist">
+        <button role="tab" data-tab="tool" class="active">Herramienta</button>
+        <button role="tab" data-tab="states">Resumen por estados</button>
+        <button role="tab" data-tab="ref">Consulta</button>
+        <button role="tab" data-tab="params">Parámetros</button>
+      </nav>
+    </div>
+  </header>
+
+  <div id="modified" class="banner wrap" hidden>
+    Estás usando parámetros modificados respecto al Excel.
+    <button class="link" data-action="reset">Restaurar valores del Excel</button>
+  </div>
+
+  <main class="wrap">
+    <div id="loading" class="loading">Cargando datos de México (malla climática e hídrica)…</div>
+
+    <!-- ============ HERRAMIENTA ============ -->
+    <section id="tab-tool" class="tab" hidden>
+      <div class="layout">
+        <aside class="panel inputs">
+          <h2><span class="num">1</span> Datos del proyecto</h2>
+          <div id="map" class="map" aria-label="Mapa: haz clic para elegir la ubicación"></div>
+          <p class="hint">Haz clic en el mapa, elige una ciudad o escribe las coordenadas.</p>
+          <label>Ciudad de referencia (opcional)
+            <select id="in-city"><option value="">— Elegir ciudad —</option></select>
+          </label>
+          <div class="row2">
+            <label>Latitud (°N)<input id="in-lat" type="number" step="0.0001" min="14" max="33"></label>
+            <label>Longitud (°E, negativa)<input id="in-lon" type="number" step="0.0001" min="-119" max="-86"></label>
+          </div>
+          <label>Tipología<select id="in-typology"></select></label>
+          <div class="row2">
+            <label>Superficie construida (m²)<input id="in-area" type="number" min="1" step="1"></label>
+            <label>Número de departamentos<input id="in-units" type="number" min="0" step="1"></label>
+          </div>
+          <label>¿Miembro de USGBC?
+            <select id="in-usgbc"><option>Sí</option><option>No</option></select>
+          </label>
+          <label>Presupuesto para certificar (USD, opcional)<input id="in-budget" type="number" min="0" step="500" placeholder="Sin límite"></label>
+          <label>Objetivo / alcance del promotor<select id="in-objective"></select></label>
+          <div id="in-errors" class="errors"></div>
+          <div class="actions">
+            <button class="btn ghost" data-action="example">Cargar ejemplo del Excel</button>
+            <button class="btn" data-action="print">Imprimir / PDF</button>
+          </div>
+        </aside>
+
+        <div class="results" id="results"></div>
+      </div>
+    </section>
+
+    <!-- ============ ESTADOS ============ -->
+    <section id="tab-states" class="tab" hidden>
+      <div class="panel">
+        <h2>Resumen por estados</h2>
+        <p class="hint" id="states-note"></p>
+        <div id="states-summary" class="chips"></div>
+        <div class="table-wrap"><table id="states-table" class="data sortable"></table></div>
+      </div>
+    </section>
+
+    <!-- ============ CONSULTA ============ -->
+    <section id="tab-ref" class="tab" hidden>
+      <div class="panel">
+        <div class="subtabs" id="ref-tabs"></div>
+        <div id="ref-body"></div>
+      </div>
+    </section>
+
+    <!-- ============ PARÁMETROS ============ -->
+    <section id="tab-params" class="tab" hidden>
+      <div class="panel">
+        <h2>Parámetros de la regla de decisión</h2>
+        <p class="hint">Son las celdas amarillas editables del Excel (HERRAMIENTA sección 6, PESOS AHP y COSTOS). Los cambios se guardan solo en este navegador y la herramienta se recalcula al instante. Para las fracciones puedes escribir <code>1/3</code>.</p>
+        <div class="actions">
+          <button class="btn ghost" data-action="reset">Restaurar valores del Excel</button>
+          <button class="btn ghost" data-action="export-params">Descargar parámetros (JSON)</button>
+          <label class="btn ghost file">Cargar parámetros (JSON)<input type="file" id="import-params" accept="application/json"></label>
+        </div>
+        <div id="params-body"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <p>Trabajo Fin de Máster · Herramienta basada en <span id="src-file">HERRAMIENTA_9NOV_v3_1.xlsx</span>. Fuentes: Beck et al. (2023), Rubel et al. (2017), CONAGUA (DOF 2023), Ali y Al Nsairat (2009), Süzer (2015), manuales de LEED v4, BREEAM Int. NC v7 y EDGE v3. Los costos indirectos son supuestos de la autora.</p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
